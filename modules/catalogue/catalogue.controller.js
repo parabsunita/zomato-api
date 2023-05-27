@@ -1,4 +1,4 @@
-const Cuisine = require("../../models/admin/cuisine.model");
+const Cuisine = require("../../models/cuisine.model");
 
 async function addCuisine(req, res) {
   const name = req.body.name;

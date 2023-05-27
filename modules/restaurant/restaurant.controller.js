@@ -1,7 +1,9 @@
-const Restaurant = require("../../../models/restaurant/restaurant.model");
-
+const Restaurant = require("../../models/restaurant.model");
+const User = require("../../models/user.model");
+const Cuisine = require("../../models/cuisine.model");
 async function addRestaurant(req, res) {
   const name = req.body.name;
+  const user_id = req.body.user_id;
   const latitude = req.body.latitude;
   const longitude = req.body.longitude;
   const contact = req.body.contact;
@@ -12,6 +14,28 @@ async function addRestaurant(req, res) {
   const opening_days = req.body.opening_days;
   const resturant_images = req.body.resturant_images;
   const food_images = req.body.food_images;
+  const approval_status = req.body.approval_status;
+  const rejection_season = req.body.rejection_season;
+
+  try {
+    let user = await User.findOne({ _id: user_id });
+  } catch (err) {
+    res.send({
+      error: true,
+      message: "User not Found",
+    });
+    return;
+  }
+
+  try {
+    let cuisine = await Cuisine.findOne({ _id: cuisines });
+  } catch (err) {
+    res.send({
+      error: true,
+      message: "Cuisine not Found",
+    });
+    return;
+  }
 
   let resturant = await Restaurant.findOne({ name: name });
 
@@ -25,6 +49,7 @@ async function addRestaurant(req, res) {
 
   let newResturant = {
     name,
+    user_id,
     latitude,
     longitude,
     contact,
@@ -33,8 +58,10 @@ async function addRestaurant(req, res) {
     cuisines,
     time_slots,
     opening_days,
+    approval_status,
     resturant_images,
     food_images,
+    rejection_season,
   };
 
   const savedRestuarant = await Restaurant.create(newResturant);
@@ -56,6 +83,19 @@ async function details(req, res) {
   res.send({
     resturants,
   });
+}
+
+async function checkCuisine() {
+  try {
+    let Cuisine = await Cuisine.findOne({ _id: cuisines });
+    if (!Cuisine) {
+      availability = false;
+    } else {
+      availability = true;
+    }
+  } catch (err) {
+    availability = false;
+  }
 }
 
 module.exports = { addRestaurant, details };

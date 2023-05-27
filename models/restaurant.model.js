@@ -6,6 +6,11 @@ const restaurantSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    user_id: {
+      type: String,
+      required: true,
+    },
+
     latitude: {
       type: String,
       required: true,
@@ -39,11 +44,20 @@ const restaurantSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    approval_status: {
+      type: String,
+      enum: ["PENDING", "REJECTED", "VERIFIED"],
+      required: true,
+    },
     resturant_images: {
       type: String,
       required: true,
     },
     food_images: {
+      type: String,
+      required: true,
+    },
+    rejection_season: {
       type: String,
       required: true,
     },
