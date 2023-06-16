@@ -38,7 +38,7 @@ const itemSchema = new mongoose.Schema(
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
   }
 );
-itemSchema.statics.getItems = (name) => {
+itemSchema.statics.getItem = (name) => {
   let query = Item.find();
 
   console.log(name.name.length);

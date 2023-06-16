@@ -1,5 +1,5 @@
 const Restaurant = require("../../models/restaurant.model");
-const User = require("../../models/user.model");
+const User = require("../../../auth/models/user.model");
 const Cuisine = require("../../models/cuisine.model");
 async function addRestaurant(req, res) {
   const name = req.body.name;
@@ -83,19 +83,6 @@ async function details(req, res) {
   res.send({
     resturants,
   });
-}
-
-async function checkCuisine() {
-  try {
-    let Cuisine = await Cuisine.findOne({ _id: cuisines });
-    if (!Cuisine) {
-      availability = false;
-    } else {
-      availability = true;
-    }
-  } catch (err) {
-    availability = false;
-  }
 }
 
 module.exports = { addRestaurant, details };
