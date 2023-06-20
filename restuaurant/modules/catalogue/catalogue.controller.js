@@ -1,15 +1,15 @@
-const Cuisine = require("../../models/cuisine.model");
+const Catalogue = require("../../models/catalogue.model");
 
-async function addCuisine(req, res) {
+async function addCatalogue(req, res) {
   const name = req.body.name;
   const status = req.body.status;
 
-  let cuisine = await Cuisine.findOne({ name: name });
+  let catalogue = await Catalogue.findOne({ name: name });
 
   if (cuisine) {
     res.send({
       error: true,
-      message: "cuisine already exists",
+      message: "catalogue already exists",
     });
     return;
   }
@@ -19,7 +19,7 @@ async function addCuisine(req, res) {
     status,
   };
 
-  const savedcuisine = await Cuisine.create(newcuisine);
+  const savedcuisine = await Catalogue.create(newcuisine);
 
   res.send({
     error: false,
@@ -31,16 +31,16 @@ async function addCuisine(req, res) {
   });
 }
 
-async function getCuisine(req, res) {
+async function getCatalogue(req, res) {
   const name = req.query.name ? req.query.name.split(",") : [];
 
   const code = req.query.code == undefined ? "" : req.query.code;
 
-  let cuisine = await Cuisine.getCuisines({ name: name });
+  let cuisine = await Catalogue.getCatalogues({ name: name });
 
   res.send({
     cuisine,
   });
 }
 
-module.exports = { addCuisine, getCuisine };
+module.exports = { addCatalogue, getCatalogue };

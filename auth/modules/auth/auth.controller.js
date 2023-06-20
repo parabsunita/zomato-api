@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { validate } = require("../../models/user.model");
 const User = require("../../models/user.model");
 
 async function login(req, res) {
@@ -75,27 +76,36 @@ async function signup(req, res) {
     password: hashedPassword,
   };
 
-  const savedUser = await User.create(newUser);
+  const savedUser = await User.create(newUser)
+    .then(() => {
+      const userJwt = jwt.sign(
+        {
+          id: savedUser.id,
+          email: savedUser.email,
+        },
+        "secret"
+      );
 
-  const userJwt = jwt.sign(
-    {
-      id: savedUser.id,
-      email: savedUser.email,
-    },
-    "secret"
-  );
-
-  res.send({
-    error: false,
-    message: "Account created successfully",
-    data: {
-      id: savedUser._id,
-      firstName: savedUser.firstName,
-      lastName: savedUser.lastName,
-      email: savedUser.email,
-      token: userJwt,
-    },
-  });
+      res.send({
+        error: false,
+        message: "Account created successfully",
+        data: {
+          id: savedUser._id,
+          firstName: savedUser.firstName,
+          lastName: savedUser.lastName,
+          email: savedUser.email,
+          token: userJwt,
+        },
+      });
+    })
+    .catch((error) => {
+      if (error.errors.user_type.path == "user_type")
+        res.send({
+          error: false,
+          message: error.errors.user_type.message,
+        });
+    });
+  console.log(savedUser);
 }
 
 module.exports = {

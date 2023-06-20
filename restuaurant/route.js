@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 
+const authRouter = require("../auth/route");
 // const catalogueRouter = require("./catalogue/catalogue.route");
 const cuisineRouter = require("./modules/cuisine/cuisine.route");
 const itemRouter = require("./modules/item/item.route");

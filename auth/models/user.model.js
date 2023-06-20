@@ -20,8 +20,18 @@ const userSchema = new mongoose.Schema(
     },
     user_type: {
       type: String,
-      enum: ["admin", "client", "restaurant"],
+
       required: true,
+      enum: {
+        values: ["admin", "client", "restaurant"],
+        message: "Invalid User type.",
+      },
+      validate: {
+        validator: function (v) {
+          return v.length > 1;
+        },
+        message: "You must provide more than 1 tag.",
+      },
     },
   },
   {
