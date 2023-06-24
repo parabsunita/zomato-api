@@ -11,13 +11,16 @@ const restaurantSchema = new mongoose.Schema(
       required: true,
     },
 
-    latitude: {
-      type: String,
-      required: true,
-    },
-    longitude: {
-      type: String,
-      required: true,
+    location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
     },
     contact: {
       type: String,
@@ -36,17 +39,43 @@ const restaurantSchema = new mongoose.Schema(
       required: true,
     },
 
-    time_slots: {
-      type: String,
+    timeslot: {
+      type: [
+        {
+          startTime: {
+            type: Date,
+            required: true,
+          },
+          endTime: {
+            type: Date,
+            required: true,
+          },
+        },
+      ],
       required: true,
     },
-    opening_days: {
-      type: String,
-      required: true,
-    },
+    opening_days: [
+      {
+        type: String,
+        enum: [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday",
+        ],
+        required: true,
+      },
+    ],
     approval_status: {
       type: String,
-      enum: ["PENDING", "REJECTED", "VERIFIED"],
+      enum: {
+        values: ["PENDING", "REJECTED", "VERIFIED"],
+        message: "Invalid Approval Status",
+      },
+      default: "PENDING",
       required: true,
     },
     resturant_images: {
@@ -69,7 +98,7 @@ const restaurantSchema = new mongoose.Schema(
   }
 );
 restaurantSchema.statics.getRestaurant = (name) => {
-  let query = Restaurant.find();
+  let query = Restaurant.find({}, "name email contact approval_status");
 
   console.log(name.name.length);
 

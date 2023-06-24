@@ -4,5 +4,5 @@ const itemController = require("./item.controller");
 
 router.post("/additem", itemController.addItem);
 router.get("/details", itemController.details);
-
+router.get("/edititem", itemController.editItem);
 module.exports = router;

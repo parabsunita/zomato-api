@@ -49,5 +49,17 @@ async function details(req, res) {
     resturants,
   });
 }
+async function editItem(req, res) {
+  const { id } = req.params;
 
-module.exports = { addItem, details };
+  const item = await Item.findByIdAndUpdate(id, req.body, { new: true });
+  if (!item) {
+    res.send({
+      error: false,
+      message: "Item not found",
+    });
+    return;
+  }
+  res.json(item);
+}
+module.exports = { addItem, details, editItem };

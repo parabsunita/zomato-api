@@ -64,15 +64,23 @@ async function addRestaurant(req, res) {
     rejection_season,
   };
 
-  const savedRestuarant = await Restaurant.create(newResturant);
-
-  res.send({
-    error: false,
-    message: "Resturant added successfully",
-    data: {
-      name: savedRestuarant.name,
-    },
-  });
+  const savedRestuarant = await Restaurant.create(newResturant)
+    .then(() => {
+      res.send({
+        error: false,
+        message: "Resturant added successfully",
+        data: {
+          name: savedRestuarant.name,
+        },
+      });
+    })
+    .catch((error) => {
+      if (error.errors.approval_status.path == "approval_status")
+        res.send({
+          error: false,
+          message: error.errors.approval_status.message,
+        });
+    });
 }
 
 async function details(req, res) {
@@ -84,5 +92,28 @@ async function details(req, res) {
     resturants,
   });
 }
+async function findResturant(req, res) {
+  const restaurant = await Restaurant.findById(req.params.id);
+  if (!restaurant) {
+    return res.status(404).json({ error: "Restaurant not found" });
+  }
+  res.json(restaurant);
+}
+async function editResturant(req, res) {
+  const restaurant = await Restaurant.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true }
+  );
 
-module.exports = { addRestaurant, details };
+  if (!restaurant) {
+    res.send({
+      error: true,
+      message: "Restuarant  not found",
+    });
+    return;
+  }
+  res.json(restaurant);
+}
+
+module.exports = { addRestaurant, details, editResturant, findResturant };

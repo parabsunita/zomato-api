@@ -7,7 +7,7 @@ const itemSchema = new mongoose.Schema(
       required: true,
     },
     price: {
-      type: String,
+      type: Number,
       required: true,
     },
 
@@ -19,15 +19,17 @@ const itemSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    is_veg: {
-      type: String,
-      required: true,
-    },
+    is_veg: { type: Boolean, default: false },
     approval_status: {
       type: String,
+      enum: {
+        values: ["PENDING", "REJECTED", "VERIFIED"],
+        message: "Invalid Approval Status",
+      },
+      default: "PENDING",
       required: true,
     },
-    resjection_status: {
+    resjection_reason: {
       type: String,
       required: true,
     },
