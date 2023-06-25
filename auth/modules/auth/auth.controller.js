@@ -76,36 +76,35 @@ async function signup(req, res) {
     password: hashedPassword,
   };
 
-  const savedUser = await User.create(newUser)
-    .then(() => {
-      const userJwt = jwt.sign(
-        {
-          id: savedUser.id,
-          email: savedUser.email,
-        },
-        "secret"
-      );
+  try {
+    const savedUser = await User.create(newUser);
 
-      res.send({
-        error: false,
-        message: "Account created successfully",
-        data: {
-          id: savedUser._id,
-          firstName: savedUser.firstName,
-          lastName: savedUser.lastName,
-          email: savedUser.email,
-          token: userJwt,
-        },
-      });
-    })
-    .catch((error) => {
-      if (error.errors.user_type.path == "user_type")
-        res.send({
-          error: false,
-          message: error.errors.user_type.message,
-        });
+    const userJwt = jwt.sign(
+      {
+        id: savedUser._id,
+        email: savedUser.email,
+      },
+      process.env.JWT_SECRET
+    );
+
+    res.send({
+      error: false,
+      message: "Account created successfully",
+      data: {
+        id: savedUser._id,
+        firstName: savedUser.firstName,
+        lastName: savedUser.lastName,
+        email: savedUser.email,
+        token: userJwt,
+      },
     });
-  console.log(savedUser);
+  } catch (error) {
+    console.error("Error creating user:", error);
+    res.status(500).send({
+      error: true,
+      message: "Failed to create user",
+    });
+  }
 }
 
 module.exports = {

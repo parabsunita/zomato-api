@@ -73,13 +73,18 @@ async function addItem(req, res) {
   const is_veg = req.body.is_veg;
   const approval_status = req.body.approval_status;
   const resjection_reason = req.body.resjection_reason;
-
-  let category = await Catalogue.find({ category_id });
-
-  if (!category) {
+  const catalog = await Catalogue.findOne({ "categories._id": category_id });
+  const category = await catalog.categories.find((category) => {
+    console.log(category._id.toString() + "    hfksdjl");
+    if (category._id.toString() == category_id) {
+      return category;
+    }
+  });
+  console.log(category);
+  if (!catalog) {
     res.send({
       error: true,
-      message: "category already exists",
+      message: "category doesn't already exists",
     });
     return;
   }
@@ -106,12 +111,11 @@ async function addItem(req, res) {
 
   const savedItem = await Item.create(newItem);
 
-  category.push(savedItem._id.toString());
-
-  console.log(category);
+  category.items.push(savedItem._id.toString());
+  catalog.save();
   res.send({
     error: false,
-    message: `Item added successfully`,
+    message: catalog,
   });
 }
 
@@ -135,7 +139,10 @@ async function editItem(req, res) {
     });
     return;
   }
-  res.json(item);
+
+  res.send({
+    item: item,
+  });
 }
 async function addCategory(req, res) {
   const { name, restaurant_id } = req.body;
