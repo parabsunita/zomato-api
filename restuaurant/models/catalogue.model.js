@@ -3,8 +3,9 @@ const mongoose = require("mongoose");
 const catalogueSchema = new mongoose.Schema(
   {
     restaurant_id: {
-      type: mongoose.SchemaType.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
+      ref: "Restaurant",
     },
     categories: [
       {
@@ -12,7 +13,7 @@ const catalogueSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
-        items: [{ type: mongoose.SchemaType.ObjectId, ref: "item" }],
+        items: [{ type: mongoose.Schema.Types.ObjectId, ref: "Item" }],
       }, // it was missing here
     ],
   },
