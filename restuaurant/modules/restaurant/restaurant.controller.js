@@ -1,6 +1,6 @@
-const Restaurant = require("../../models/restaurant.model");
-const User = require("../../../auth/models/user.model");
-const Cuisine = require("../../models/cuisine.model");
+const Restaurant = require("../../../models/restaurant.model");
+const User = require("../../../models/user.model");
+const Cuisine = require("../../../models/cuisine.model");
 async function addRestaurant(req, res) {
   const name = req.body.name;
   const user_id = req.body.user_id;

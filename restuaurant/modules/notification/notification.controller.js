@@ -1,4 +1,4 @@
-const Notification = require("../../models/notification.model");
+const Notification = require("../../../models/notification.model");
 async function addNotification(req, res) {
   const { title, body, image_url, topic, delivery_date, delivery_status } =
     req.body;

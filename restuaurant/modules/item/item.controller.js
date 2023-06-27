@@ -1,4 +1,4 @@
-const Item = require("../../models/item.model");
+const Item = require("../../../models/item.model");
 
 async function addItem(req, res) {
   const name = req.body.name;

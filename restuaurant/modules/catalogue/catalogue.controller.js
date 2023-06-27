@@ -1,6 +1,6 @@
-const Catalogue = require("../../models/catalogue.model");
-const Item = require("../../models/item.model");
-const Restaurant = require("../../models/restaurant.model");
+const Catalogue = require("../../../models/catalogue.model");
+const Item = require("../../../models/item.model");
+const Restaurant = require("../../../models/restaurant.model");
 console.log("hgjvh");
 async function addCatalogue(req, res) {
   const catalogue = await Catalogue.findOne({});
