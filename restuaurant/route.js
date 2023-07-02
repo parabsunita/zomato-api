@@ -9,6 +9,6 @@ const restaurantRouter = require("./modules/restaurant/restaurant.route");
 
 router.use("/catalogue", catalogueRouter);
 router.use("/cuisine", cuisineRouter);
-router.use("/resturant", restaurantRouter);
+router.use("/restaurant", restaurantRouter);
 router.use("/item", itemRouter);
 module.exports = router;

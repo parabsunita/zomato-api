@@ -17,10 +17,7 @@ const restaurantSchema = new mongoose.Schema(
         enum: ["Point"],
         required: true,
       },
-      coordinates: {
-        type: [Number],
-        required: true,
-      },
+      coordinates: [Number],
     },
     contact: {
       type: String,
@@ -98,7 +95,7 @@ const restaurantSchema = new mongoose.Schema(
   }
 );
 restaurantSchema.statics.getRestaurant = (name) => {
-  let query = Restaurant.find({}, "name email contact approval_status");
+  let query = Restaurant.find();
 
   console.log(name.name.length);
 
@@ -116,5 +113,10 @@ restaurantSchema.statics.updateResturant = (_id, updateId) => {
 
   return query;
 };
+
 const Restaurant = mongoose.model("Restaurant", restaurantSchema);
+Restaurant.collection.createIndex(
+  { location: "2dsphere" },
+  { maxTimeMS: 30000 }
+);
 module.exports = Restaurant;

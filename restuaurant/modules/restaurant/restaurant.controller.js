@@ -1,11 +1,12 @@
 const Restaurant = require("../../../models/restaurant.model");
 const User = require("../../../models/user.model");
+const mongoose = require("mongoose");
 const Cuisine = require("../../../models/cuisine.model");
 async function addRestaurant(req, res) {
   const name = req.body.name;
   const user_id = req.body.user_id;
-  const latitude = req.body.latitude;
-  const longitude = req.body.longitude;
+  const location = req.body.location;
+
   const contact = req.body.contact;
   const email = req.body.email;
   const address = req.body.address;
@@ -28,7 +29,7 @@ async function addRestaurant(req, res) {
   }
 
   try {
-    let cuisine = await Cuisine.findOne({ _id: cuisines });
+    let cuisine = await Cuisine.findOne({ name: cuisines });
   } catch (err) {
     res.send({
       error: true,
@@ -47,11 +48,15 @@ async function addRestaurant(req, res) {
     return;
   }
 
+  // let location1={
+  //   type:{location.type},
+  //   cordinates:{location.cordinates},
+  // }
+
   let newResturant = {
     name,
     user_id,
-    latitude,
-    longitude,
+    location,
     contact,
     email,
     address,
@@ -64,23 +69,31 @@ async function addRestaurant(req, res) {
     rejection_season,
   };
 
-  const savedRestuarant = await Restaurant.create(newResturant)
-    .then(() => {
-      res.send({
-        error: false,
-        message: "Resturant added successfully",
-        data: {
-          name: savedRestuarant.name,
-        },
-      });
-    })
-    .catch((error) => {
-      if (error.errors.approval_status.path == "approval_status")
-        res.send({
-          error: false,
-          message: error.errors.approval_status.message,
-        });
-    });
+  const savedRestuarant = await Restaurant.create(newResturant);
+
+  res.send({
+    error: false,
+    message: "Resturant added successfully",
+    data: {
+      name: savedRestuarant.name,
+    },
+  });
+  // .then(() => {
+  //   res.send({
+  //     error: false,
+  //     message: "Resturant added successfully",
+  //     data: {
+  //       name: savedRestuarant.name,
+  //     },
+  //   });
+  // })
+  // .catch((error) => {
+  //   if (error.errors.approval_status.path == "approval_status")
+  //     res.send({
+  //       error: false,
+  //       message: error.errors.approval_status.message,
+  //     });
+  // });
 }
 
 async function details(req, res) {
@@ -115,5 +128,31 @@ async function editResturant(req, res) {
   }
   res.json(restaurant);
 }
+async function clearCollection(req, res) {
+  mongoose.connect(
+    "mongodb+srv://seven-food:sevenfood.com@seven-food.717os.mongodb.net/zomato_dev?retryWrites=true&w=majority",
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  );
 
-module.exports = { addRestaurant, details, editResturant, findResturant };
+  // Drop the "Restaurant" collection
+  Restaurant.collection.drop((error) => {
+    if (error) {
+      console.log("Error dropping collection:", error);
+    } else {
+      console.log("Restaurant collection dropped successfully.");
+    }
+  });
+  res.send({
+    status: "kehks",
+  });
+}
+module.exports = {
+  addRestaurant,
+  details,
+  editResturant,
+  findResturant,
+  clearCollection,
+};

@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const app = require("./app");
 const port = 3000;
 console.log(process.env.DB_URL);
+
 mongoose
   .connect(process.env.DB_URL)
   .then(() => {
