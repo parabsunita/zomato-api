@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const Catalogue = require("../../../models/catalogue.model");
-const Item = require("../../../models/item.model");
 const Restaurant = require("../../../models/restaurant.model");
 async function retrieveCatalogueWithItems(req, res) {
   const { restaurantId } = req.params;
