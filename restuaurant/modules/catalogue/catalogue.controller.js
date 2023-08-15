@@ -122,10 +122,10 @@ async function addItem(req, res) {
 async function details(req, res) {
   const name = req.query.name ? req.query.name.split(",") : [];
   console.log(name);
-  let resturants = await Item.getItem({ name: name });
+  let Items = await Item.getItem({ name: name });
 
   res.send({
-    resturants,
+    Items,
   });
 }
 async function editItem(req, res) {
@@ -194,7 +194,7 @@ async function addCategory(req, res) {
 
   res.send({
     error: false,
-    catalog: savedCatalog,
+    message: "Category added successfully!!!!",
   });
 
   //saved catelouge

@@ -11,7 +11,7 @@ async function addRestaurant(req, res) {
   const email = req.body.email;
   const address = req.body.address;
   const cuisines = req.body.cuisines;
-  const time_slots = req.body.time_slots;
+  const timeslot = req.body.time_slots;
   const opening_days = req.body.opening_days;
   const resturant_images = req.body.resturant_images;
   const food_images = req.body.food_images;
@@ -61,13 +61,14 @@ async function addRestaurant(req, res) {
     email,
     address,
     cuisines,
-    time_slots,
+    timeslot,
     opening_days,
     approval_status,
     resturant_images,
     food_images,
     rejection_season,
   };
+  console.log(newResturant.timeslot);
 
   const savedRestuarant = await Restaurant.create(newResturant);
 

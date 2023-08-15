@@ -43,7 +43,7 @@ async function login(req, res) {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      id: _id,
+
       token: userJwt,
     },
   });

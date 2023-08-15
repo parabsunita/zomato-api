@@ -32,8 +32,9 @@ const restaurantSchema = new mongoose.Schema(
       required: true,
     },
     cuisines: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
+      ref: "Cuisine",
     },
 
     timeslot: {
@@ -76,11 +77,11 @@ const restaurantSchema = new mongoose.Schema(
       required: true,
     },
     resturant_images: {
-      type: String,
+      type: [String],
       required: true,
     },
     food_images: {
-      type: String,
+      type: [String],
       required: true,
     },
     rejection_season: {

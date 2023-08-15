@@ -19,7 +19,7 @@ async function addItem(req, res) {
     return;
   }
 
-  let newResturant = {
+  let newItem = {
     name,
     price,
     description,
@@ -29,13 +29,13 @@ async function addItem(req, res) {
     resjection_status,
   };
 
-  const savedRestuarant = await Item.create(newResturant);
+  const savedItem = await Item.create(newItem);
 
   res.send({
     error: false,
     message: "Item added successfully",
     data: {
-      name: savedRestuarant.name,
+      name: savedItem.name,
     },
   });
 }

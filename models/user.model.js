@@ -21,7 +21,6 @@ const userSchema = new mongoose.Schema(
     user_type: {
       type: String,
 
-      required: true,
       enum: {
         values: ["admin", "client", "restaurant"],
         message: "Invalid User type.",
