@@ -1,5 +1,6 @@
 const Catalogue = require("../../../models/catalogue.model");
 const Item = require("../../../models/item.model");
+const mongoose = require("mongoose");
 const Restaurant = require("../../../models/restaurant.model");
 console.log("hgjvh");
 async function addCatalogue(req, res) {
@@ -10,11 +11,9 @@ async function addCatalogue(req, res) {
       message: "Referenced Catalogue not found",
     });
     return;
-  } else {
   }
-
   // Check if the referenced restaurant exist
-  const restaurant = await Restaurant.findById(req.body.restaurantid);
+  const restaurant = await Restaurant.findById(req.body.restaurant_id);
 
   if (!restaurant) {
     res.send({
@@ -41,7 +40,10 @@ async function addCatalogue(req, res) {
     }
   });
 
-  const savedcatalogue = await Catalogue.create(req.body);
+  const savedcatalogue = await Catalogue.create({
+    restaurant_id,
+    categories: [],
+  });
 
   res.send({
     error: false,
@@ -53,17 +55,47 @@ async function addCatalogue(req, res) {
 }
 
 async function getCatalogue(req, res) {
-  const name = req.query.name ? req.query.name.split(",") : [];
+  const catalogue = await Catalogue.aggregate([
+    {
+      $match: {
+        restaurant_id: new mongoose.Types.ObjectId(req.params.id), // Replace with the actual restaurant ID
+      },
+    },
+    {
+      $lookup: {
+        from: "items", // Replace with the actual collection name for items
+        localField: "categories.items",
+        foreignField: "_id",
+        as: "itemsDetails",
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        restaurant_id: 1,
+        categories: {
+          $map: {
+            input: "$categories",
+            as: "category",
+            in: {
+              name: "$$category.name",
+              items: "$itemsDetails",
+            },
+          },
+        },
+      },
+    },
+  ]);
 
-  const code = req.query.code == undefined ? "" : req.query.code;
-
-  let cuisine = await Catalogue.getCatalogues({ name: name });
-
+  res.json(catalogue);
+}
+async function getAllCatalogue(req, res) {
+  const catalogue = await Catalogue.find();
+  console.log(catalogue);
   res.send({
-    cuisine,
+    catalogue,
   });
 }
-
 async function addItem(req, res) {
   const name = req.body.name;
   const category_id = req.body.category_id;
@@ -74,6 +106,7 @@ async function addItem(req, res) {
   const approval_status = req.body.approval_status;
   const resjection_reason = req.body.resjection_reason;
   const catalog = await Catalogue.findOne({ "categories._id": category_id });
+  console.log(catalog);
   const category = await catalog.categories.find((category) => {
     console.log(category._id.toString() + "    hfksdjl");
     if (category._id.toString() == category_id) {
@@ -81,14 +114,14 @@ async function addItem(req, res) {
     }
   });
   console.log(category);
-  if (!catalog) {
+  if (!category) {
     res.send({
       error: true,
-      message: "category doesn't already exists",
+      message: "category doesn't  exists",
     });
     return;
   }
-  let item = await Item.findOne({});
+  let item = await Item.findOne({ name: name });
 
   if (!item) {
     res.send({
@@ -171,7 +204,6 @@ async function addCategory(req, res) {
   // Find the category with the provided name in the catalog
   const category = catalog.categories.find((cat) => cat.name === name);
 
-  // If category exists, throw an error (assuming unique category names)
   if (category) {
     res.send({
       error: true,
@@ -180,7 +212,6 @@ async function addCategory(req, res) {
     return;
   }
 
-  // Create a new category object with the provided name and an empty array of items
   const newCategory = {
     name,
     items: [],
@@ -209,6 +240,7 @@ async function getCategory(req, res) {
 module.exports = {
   addCatalogue,
   getCatalogue,
+  getAllCatalogue,
   addItem,
   details,
   editItem,

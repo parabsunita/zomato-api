@@ -3,7 +3,8 @@ const router = express.Router();
 const catalogueController = require("./catalogue.controller");
 
 router.post("/addcatalogue", catalogueController.addCatalogue);
-router.get("/getcatalogue", catalogueController.getCatalogue);
+router.get("/getcatalogue/:id", catalogueController.getCatalogue);
+router.get("/getallcatalogue", catalogueController.getAllCatalogue);
 router.post("/addcategory", catalogueController.addCategory);
 router.get("/getcategory", catalogueController.getCategory);
 router.post("/additem", catalogueController.addItem);

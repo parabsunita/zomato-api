@@ -28,16 +28,6 @@ cuisineSchema.statics.getCuisines = (name) => {
 
   return query;
 };
-// categorySchema.statics.updateCategory = (name, updatename) => {
-//   query1 = Category.find();
-//   query1.where("name").in(name);
-//   console.log(query1.category);
-//   const query = Category.updateOne(
-//     { name: name },
-//     { $set: { name: updatename } }
-//   );
 
-//   return query;
-// };
 const Cuisine = mongoose.model("Cuisine", cuisineSchema);
 module.exports = Cuisine;

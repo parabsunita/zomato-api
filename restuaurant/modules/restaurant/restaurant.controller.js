@@ -2,6 +2,7 @@ const Restaurant = require("../../../models/restaurant.model");
 const User = require("../../../models/user.model");
 const mongoose = require("mongoose");
 const Cuisine = require("../../../models/cuisine.model");
+const Item = require("../../../models/item.model");
 async function addRestaurant(req, res) {
   const name = req.body.name;
   const user_id = req.body.user_id;
@@ -28,16 +29,6 @@ async function addRestaurant(req, res) {
     return;
   }
 
-  try {
-    let cuisine = await Cuisine.findOne({ name: cuisines });
-  } catch (err) {
-    res.send({
-      error: true,
-      message: "Cuisine not Found",
-    });
-    return;
-  }
-
   let resturant = await Restaurant.findOne({ name: name });
 
   if (resturant) {
@@ -47,11 +38,6 @@ async function addRestaurant(req, res) {
     });
     return;
   }
-
-  // let location1={
-  //   type:{location.type},
-  //   cordinates:{location.cordinates},
-  // }
 
   let newResturant = {
     name,
@@ -99,11 +85,37 @@ async function addRestaurant(req, res) {
 
 async function details(req, res) {
   const name = req.query.name ? req.query.name.split(",") : [];
-  console.log(name);
-  let resturants = await Restaurant.getRestaurant({ name: name });
+
+  const restaurants = await Restaurant.aggregate([
+    {
+      $lookup: {
+        from: "cuisines", // Name of the Cuisine collection
+        localField: "cuisines",
+        foreignField: "_id",
+        as: "cuisineDetails",
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        location: 1,
+        contact: 1,
+        email: 1,
+        address: 1,
+        timeslot: 1,
+        opening_days: 1,
+        approval_status: 1,
+        resturant_images: 1,
+        food_images: 1,
+        rejection_season: 1,
+        cuisines: "$cuisineDetails.name",
+      },
+    },
+  ]);
 
   res.send({
-    resturants,
+    restaurants,
   });
 }
 async function findResturant(req, res) {
@@ -111,7 +123,39 @@ async function findResturant(req, res) {
   if (!restaurant) {
     return res.status(404).json({ error: "Restaurant not found" });
   }
-  res.json(restaurant);
+  const restaurantId = req.params.id;
+  const restaurants = await Restaurant.aggregate([
+    {
+      $match: { _id: new mongoose.Types.ObjectId(restaurantId) }, // Convert the restaurantId to ObjectId
+    },
+    {
+      $lookup: {
+        from: "cuisines", // Name of the Cuisine collection
+        localField: "cuisines",
+        foreignField: "_id",
+        as: "cuisineDetails",
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        location: 1,
+        contact: 1,
+        email: 1,
+        address: 1,
+        timeslot: 1,
+        opening_days: 1,
+        approval_status: 1,
+        resturant_images: 1,
+        food_images: 1,
+        rejection_season: 1,
+        cuisines: "$cuisineDetails.name",
+      },
+    },
+  ]);
+
+  res.json(restaurants);
 }
 async function editResturant(req, res) {
   const restaurant = await Restaurant.findByIdAndUpdate(
@@ -139,7 +183,7 @@ async function clearCollection(req, res) {
   );
 
   // Drop the "Restaurant" collection
-  Restaurant.collection.drop((error) => {
+  Item.collection.drop((error) => {
     if (error) {
       console.log("Error dropping collection:", error);
     } else {

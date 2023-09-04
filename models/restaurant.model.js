@@ -31,11 +31,13 @@ const restaurantSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    cuisines: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "Cuisine",
-    },
+    cuisines: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: "Cuisine",
+      },
+    ],
 
     timeslot: {
       type: [
