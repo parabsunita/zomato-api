@@ -3,6 +3,8 @@ const User = require("../../../models/user.model");
 const mongoose = require("mongoose");
 const Cuisine = require("../../../models/cuisine.model");
 const Item = require("../../../models/item.model");
+const Catalogue = require("../../../models/catalogue.model");
+const Cart = require("../../../models/cart.model");
 async function addRestaurant(req, res) {
   const name = req.body.name;
   const user_id = req.body.user_id;
@@ -183,7 +185,7 @@ async function clearCollection(req, res) {
   );
 
   // Drop the "Restaurant" collection
-  Item.collection.drop((error) => {
+  Cart.collection.drop((error) => {
     if (error) {
       console.log("Error dropping collection:", error);
     } else {

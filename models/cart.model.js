@@ -8,12 +8,16 @@ const cartSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "MenuItem",
       },
-      quantity: Number,
+      quantity: { type: Number, required: true },
     },
   ],
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
+  },
+  resturant_id: {
+    type: String,
+    required: true,
   },
 });
 

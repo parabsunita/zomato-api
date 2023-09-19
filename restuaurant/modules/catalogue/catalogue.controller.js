@@ -2,17 +2,18 @@ const Catalogue = require("../../../models/catalogue.model");
 const Item = require("../../../models/item.model");
 const mongoose = require("mongoose");
 const Restaurant = require("../../../models/restaurant.model");
-console.log("hgjvh");
+
 async function addCatalogue(req, res) {
-  const catalogue = await Catalogue.findOne({});
-  if (!catalogue) {
-    res.send({
-      error: true,
-      message: "Referenced Catalogue not found",
-    });
-    return;
-  }
+  // const catalogue = await Catalogue.findOne({});
+  // if (!catalogue) {
+  //   res.send({
+  //     error: true,
+  //     message: "Referenced Catalogue not found",
+  //   });
+  //   return;
+  // }
   // Check if the referenced restaurant exist
+  const restaurant_id = req.body.restaurant_id;
   const restaurant = await Restaurant.findById(req.body.restaurant_id);
 
   if (!restaurant) {
@@ -108,7 +109,7 @@ async function addItem(req, res) {
   const catalog = await Catalogue.findOne({ "categories._id": category_id });
   console.log(catalog);
   const category = await catalog.categories.find((category) => {
-    console.log(category._id.toString() + "    hfksdjl");
+    console.log(category._id.toString(), category_id);
     if (category._id.toString() == category_id) {
       return category;
     }
@@ -117,13 +118,13 @@ async function addItem(req, res) {
   if (!category) {
     res.send({
       error: true,
-      message: "category doesn't  exists",
+      message: "category doesn't gcj exists",
     });
     return;
   }
   let item = await Item.findOne({ name: name });
-
-  if (!item) {
+  console.log(item);
+  if (item) {
     res.send({
       error: true,
       message: "item already exists",
@@ -133,7 +134,6 @@ async function addItem(req, res) {
 
   let newItem = {
     name,
-    category_id,
     price,
     description,
     img_url,
@@ -148,7 +148,7 @@ async function addItem(req, res) {
   catalog.save();
   res.send({
     error: false,
-    message: catalog,
+    message: "gff",
   });
 }
 

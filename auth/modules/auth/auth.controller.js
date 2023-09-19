@@ -106,8 +106,13 @@ async function signup(req, res) {
     });
   }
 }
-
+async function details(req, res) {
+  const Users = await User.find();
+  console.log(Users);
+  res.send({});
+}
 module.exports = {
   login,
   signup,
+  details,
 };

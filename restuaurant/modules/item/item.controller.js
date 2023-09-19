@@ -7,7 +7,8 @@ async function addItem(req, res) {
   const img_url = req.body.img_url;
   const is_veg = req.body.is_veg;
   const approval_status = req.body.approval_status;
-  const resjection_status = req.body.resjection_status;
+  const resjection_status = req.body.rejection_status;
+  const rejection_reason = req.body.rejection_reason;
 
   let item = await Item.findOne({ name: name });
 
