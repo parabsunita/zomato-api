@@ -12,12 +12,16 @@ const restaurantSchema = new mongoose.Schema(
     },
 
     location: {
-      type: {
-        type: String,
-        enum: ["Point"],
-        required: true,
-      },
-      coordinates: [Number],
+      type: [
+        {
+          type: {
+            type: String,
+            enum: ["Point"],
+            required: true,
+          },
+          coordinates: [Number],
+        },
+      ],
     },
     contact: {
       type: String,

@@ -1,5 +1,24 @@
 const mongoose = require("mongoose");
 
+const addressSchema = new mongoose.Schema({
+  street: {
+    type: String,
+    required: true,
+  },
+  city: {
+    type: String,
+    required: true,
+  },
+  state: {
+    type: String,
+    required: true,
+  },
+  zipCode: {
+    type: String,
+    required: true,
+  },
+});
+
 const userSchema = new mongoose.Schema(
   {
     firstName: {
@@ -18,18 +37,15 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    user_type: {
+    address: [addressSchema], // Use the address schema as an array of objects
+    userType: {
       type: String,
-
-      enum: {
-        values: ["admin", "client", "restaurant"],
-        message: "Invalid User type.",
-      },
+      enum: ["admin", "client", "restaurant"],
+      required: true,
     },
   },
   {
     collation: { locale: "en_US", strength: 1 },
-    usePushEach: true,
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
   }
 );

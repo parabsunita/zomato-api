@@ -54,7 +54,8 @@ async function signup(req, res) {
   const password = req.body.password;
   const firstName = req.body.firstName;
   const lastName = req.body.lastName;
-  const user_type = req.body.user_type;
+  const userType = req.body.userType;
+  const address = req.body.address; // Assuming req.body.address is an object containing address fields
 
   let user = await User.findOne({ email: email });
 
@@ -72,7 +73,8 @@ async function signup(req, res) {
     firstName,
     lastName,
     email,
-    user_type,
+    userType,
+    address: [address], // Wrap the address object in an array if it's not already an array
     password: hashedPassword,
   };
 
@@ -95,6 +97,7 @@ async function signup(req, res) {
         firstName: savedUser.firstName,
         lastName: savedUser.lastName,
         email: savedUser.email,
+        address: savedUser.address, // Include the address in the response
         token: userJwt,
       },
     });
@@ -109,10 +112,37 @@ async function signup(req, res) {
 async function details(req, res) {
   const Users = await User.find();
   console.log(Users);
-  res.send({});
+  res.send({ Users });
+}
+async function addAddress(req, res) {
+  const userId = req.params.userId;
+
+  const { street, city, state, zipCode } = req.body;
+  console.log("hwkah");
+  try {
+    // Find the user by ID
+    const user = await User.findById(userId);
+
+    // Check if the user exists
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Add the new address to the user's address array
+    user.address.push({ street, city, state, zipCode });
+
+    // Save the updated user document
+    await user.save();
+
+    res.status(201).json({ message: "Address added successfully", user });
+  } catch (error) {
+    console.error("Error adding address:", error);
+    res.status(500).json({ error: true, message: "Failed to add address" });
+  }
 }
 module.exports = {
   login,
   signup,
   details,
+  addAddress,
 };

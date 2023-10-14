@@ -1,8 +1,9 @@
 // routes/cart.js
 const mongoose = require("mongoose");
-
+const User = require("../../../models/user.model");
 const Item = require("../../../models/item.model");
 const Cart = require("../../../models/cart.model"); // Import the Cart model
+const Restaurant = require("../../../models/restaurant.model");
 
 // Add an item to the cart
 async function addToCart(req, res) {
@@ -60,7 +61,10 @@ async function addToCart(req, res) {
       existingCartItem.quantity += 1;
     } else {
       // Add the item to the cart
-      userCart.items.push({ menuItem: items[0].menuItem, quantity: 1 });
+      userCart.items.push({
+        menuItem: items[0].menuItem,
+        quantity: items[0].quantity,
+      });
     }
   }
 
@@ -68,11 +72,14 @@ async function addToCart(req, res) {
   await userCart.save();
 
   res.send({
-    userCart,
+    message: "Item added to cart",
   });
 }
 async function cartDetails(req, res) {
   const user = req.params.user;
+  const lattitude = req.body.lattitude;
+  const langitude = req.body.langitude;
+
   const userCart = await Cart.aggregate([
     {
       $match: { user: new mongoose.Types.ObjectId(user) },
@@ -110,9 +117,44 @@ async function cartDetails(req, res) {
     return res.status(404).json({ message: "Cart not found" });
   }
 
-  res.json({ cart: userCart[0] });
+  const userAddress = await User.findById(user).select("address");
+  console.log(userAddress);
+  // const cart = await Cart.find({ user: user });
+  const resturant = await Restaurant.find({
+    _id: userCart[0].restaurant_id,
+  });
+  const resturantCord = resturant[0].location[0].coordinates;
+  // res.json({ cart: resturant[0].location[0].coordinates });
+  console.log(req.body.lattitude);
+  const charges =
+    calculateDistance(
+      req.query.lattitude,
+      req.query.langitude,
+      resturantCord[0],
+      resturantCord[1]
+    ) * 10;
+  // Calculate total price for each item and sum them up
+  const totalPrice = userCart.reduce((acc, cartItem) => {
+    const itemTotalPrice = cartItem.items.reduce((itemAcc, item) => {
+      const { price } = item.menuItem;
+      const { quantity } = item;
+      console.log(quantity);
+      itemAcc += price * quantity;
+      return itemAcc;
+    }, 0);
+
+    acc += itemTotalPrice;
+    return acc;
+  }, 0);
+
+  res.json({
+    cart: userCart,
+    charges: charges,
+    totalPrice: totalPrice,
+    userAddress: userAddress,
+  });
 }
-async function updateCart(res, req) {
+async function updateCart(req, res) {
   try {
     const { itemId, user, quantity } = req.body;
 
@@ -148,8 +190,10 @@ async function updateCart(res, req) {
     }
 
     // Update the item quantity
-    cartItem.quantity = quantity;
-
+    cartItem.quantity = parseInt(cartItem.quantity) + parseInt(quantity);
+    if (cartItem.quantity == 0) {
+      return removeItem(req, res);
+    }
     await userCart.save();
 
     res.json({ message: "Cart updated successfully" });
@@ -157,41 +201,52 @@ async function updateCart(res, req) {
     res.status(500).json({ error: "Internal server error" });
   }
 }
-async function removeItem(res, req) {
-  try {
-    const user = req.params.user;
-    const itemId = req.params.itemId;
+async function removeItem(req, res) {
+  const user = req.body.user;
+  const itemId = req.body.itemId;
 
-    if (!user || !itemId) {
-      return res
-        .status(400)
-        .json({ message: "Both user and itemId are required" });
-    }
-
-    // Find the user's cart
-    const userCart = await Cart.findOne({ user: user });
-
-    if (!userCart) {
-      return res.status(404).json({ message: "Cart not found" });
-    }
-
-    // Find the index of the item to remove
-    const itemIndex = userCart.items.findIndex(
-      (item) => item.menuItem.toString() === itemId
-    );
-
-    if (itemIndex === -1) {
-      return res.status(404).json({ message: "Item not found in the cart" });
-    }
-
-    // Remove the item from the cart
-    userCart.items.splice(itemIndex, 1);
-
-    await userCart.save();
-
-    res.json({ message: "Item removed from the cart" });
-  } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+  if (!user || !itemId) {
+    return res
+      .status(400)
+      .json({ message: "Both user and itemId are required" });
   }
+
+  // Find the user's cart
+  const userCart = await Cart.findOne({ user: user });
+
+  if (!userCart) {
+    return res.status(404).json({ message: "Cart not found" });
+  }
+
+  // Find the index of the item to remove
+  const itemIndex = userCart.items.findIndex(
+    (item) => item.menuItem.toString() === itemId
+  );
+
+  if (itemIndex === -1) {
+    return res.status(404).json({ message: "Item not found in the cart" });
+  }
+
+  // Remove the item from the cart
+  userCart.items.splice(itemIndex, 1);
+
+  await userCart.save();
+
+  res.send({ message: "Item removed from the cart" });
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Radius of the Earth in km
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) *
+      Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c; // Distance in km
+  return Math.round(distance) * 10;
 }
 module.exports = { addToCart, cartDetails, updateCart, removeItem };

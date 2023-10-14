@@ -185,7 +185,7 @@ async function clearCollection(req, res) {
   );
 
   // Drop the "Restaurant" collection
-  Cart.collection.drop((error) => {
+  User.collection.drop((error) => {
     if (error) {
       console.log("Error dropping collection:", error);
     } else {
